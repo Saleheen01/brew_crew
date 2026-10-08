@@ -2,35 +2,52 @@ import 'package:flutter/material.dart';
 import 'package:brew_crew/services/auth.dart';
 import 'package:brew_crew/services/databse.dart';
 import 'package:provider/provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:brew_crew/models/brew.dart';
 import 'package:brew_crew/screens/home/brew_list.dart';
+import 'package:brew_crew/screens/home/settings_form.dart';
 
 class Home extends StatelessWidget {
+  const Home({super.key});
 
-   AuthService get _auth => AuthService();
+  AuthService get _auth => AuthService();
+
   @override
   Widget build(BuildContext context) {
-    return StreamProvider<QuerySnapshot?>.value(
+
+    void showSettingsPanel() {
+      showModalBottomSheet(context: context, builder: (context) {
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 60.0),
+          child: const SettingsForm(),
+        );
+      });
+    }
+
+    return StreamProvider<List<Brew>>.value(
       value: DatabaseService().brews,
-      initialData: null,
+      initialData: const [],
       child: Scaffold(
         backgroundColor: Colors.brown[50],
         appBar: AppBar(
-          title: Text("Brew_Crew"),
+          title: const Text("Brew_Crew"),
           backgroundColor: Colors.brown[400],
           elevation: 0.0,
           actions: [
-           FilledButton.icon(
-              onPressed: () async{
+            TextButton.icon(
+              icon: const Icon(Icons.person, color: Colors.white),
+              label: const Text('settings', style: TextStyle(color: Colors.white)),
+              onPressed: () => showSettingsPanel(),
+            ),
+            FilledButton.icon(
+              onPressed: () async {
                 await _auth.signOut();
               },
-              icon: Icon(Icons.logout),
-              label: Text("Logout"),
+              icon: const Icon(Icons.logout),
+              label: const Text("Logout"),
             ),
           ],
         ),
-
-        body: BrewList(),
+        body: const BrewList(),
       ),
     );
   }
